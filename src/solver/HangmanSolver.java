@@ -12,6 +12,7 @@ import java.util.*;
  */
 public abstract class HangmanSolver
 {
+
     /**
      * A new game has started.
      *
