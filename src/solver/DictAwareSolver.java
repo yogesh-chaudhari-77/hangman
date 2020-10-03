@@ -55,7 +55,7 @@ public class DictAwareSolver extends HangmanSolver
     public void newGame(int[] wordLengths, int maxIncorrectGuesses)
     {
         // Trim known words to contain words with word to be gussed length
-        this.knownWords = this.trimSampleSetBySize(wordLengths[0]);
+        this.trimSampleSetBySize(wordLengths[0]);
 
         // Calculate the symbols and number of words with it
         this.calSampleSetCharFreqMap(this.knownWords);
@@ -69,9 +69,6 @@ public class DictAwareSolver extends HangmanSolver
         // Pick the most popular symbol
         char probableGuess = (char) this.sortedFreqMap.keySet().toArray()[0];
 
-        // Mark it as guessed
-        this.guessedChars.add(probableGuess);
-
         return probableGuess;
 
     } // end of makeGuess()
@@ -80,13 +77,15 @@ public class DictAwareSolver extends HangmanSolver
     @Override
     public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
     {
+        // Mark it as guessed
+        this.guessedChars.add(c);
+
         // Character Found
         if(bGuess){
-            this.knownWords = trimSampleSetByCharacter(c, "AT", lPositions.get(0));
+            trimSampleSetByCharacter(c, "AT", lPositions.get(0));
         }else{
             // Wrong guess
-            this.knownWords = trimSampleSetByCharacter(c, "NOT_AT", lPositions.get(0));
-
+            trimSampleSetByCharacter(c, "NOT_AT", lPositions.get(0));
         }
 
         // Recalculate the popularity of symbols in reduced dictionary
@@ -160,10 +159,9 @@ public class DictAwareSolver extends HangmanSolver
      * Hopefully this will reduce the initial sample size
      * @param wordSize
      */
-    public Set<String> trimSampleSetBySize(int wordSize){
+    public void trimSampleSetBySize(int wordSize){
         System.out.println(""+wordSize);
-        Set<String> reducedSet = this.knownWords.stream().filter(word -> word.length() == wordSize).collect(Collectors.toSet());
-        return  reducedSet;
+        this.knownWords = this.knownWords.stream().filter(word -> word.length() == wordSize).collect(Collectors.toSet());
     }
 
 
@@ -174,7 +172,7 @@ public class DictAwareSolver extends HangmanSolver
      * @param lPositions - positions where c was found, if found
      * @return
      */
-    public Set<String> trimSampleSetByCharacter(char c, String op, ArrayList<Integer> lPositions){
+    public void trimSampleSetByCharacter(char c, String op, ArrayList<Integer> lPositions){
 
         Set<String> reducedSet = new HashSet<>();
 
@@ -210,7 +208,53 @@ public class DictAwareSolver extends HangmanSolver
             break;
         }
 
-        return reducedSet;
+        this.knownWords = reducedSet;
     }
+
+
+
+    // Accessor methods starts here
+
+    public Set<String> getKnownWords() {
+        return knownWords;
+    }
+
+    public void setKnownWords(Set<String> knownWords) {
+        this.knownWords = knownWords;
+    }
+
+    public List<Character> getGuessedChars() {
+        return guessedChars;
+    }
+
+    public void setGuessedChars(List<Character> guessedChars) {
+        this.guessedChars = guessedChars;
+    }
+
+    public HashMap<Character, Integer> getSampleSetCharFreqMap() {
+        return sampleSetCharFreqMap;
+    }
+
+    public void setSampleSetCharFreqMap(HashMap<Character, Integer> sampleSetCharFreqMap) {
+        this.sampleSetCharFreqMap = sampleSetCharFreqMap;
+    }
+
+    public LinkedHashMap<Character, Integer> getSortedFreqMap() {
+        return sortedFreqMap;
+    }
+
+    public void setSortedFreqMap(LinkedHashMap<Character, Integer> sortedFreqMap) {
+        this.sortedFreqMap = sortedFreqMap;
+    }
+
+    public int getWordLength() {
+        return wordLength;
+    }
+
+    public void setWordLength(int wordLength) {
+        this.wordLength = wordLength;
+    }
+    // Accessor methods ends here
+
 
 } // end of class DictAwareSolver
