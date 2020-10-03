@@ -91,6 +91,8 @@ public class DictAwareSolver extends HangmanSolver
 
         // Recalculate the popularity of symbols in reduced dictionary
         this.calSampleSetCharFreqMap(this.knownWords);
+        // System.out.println("Known words reduced to "+this.knownWords.size());
+        // System.out.println(knownWords);
 
     } // end of guessFeedback()
 
@@ -108,7 +110,7 @@ public class DictAwareSolver extends HangmanSolver
             }
         };
 
-        System.out.println(sampleSetCharFreqMap);
+        //System.out.println(sampleSetCharFreqMap);
     }
 
     /**
@@ -144,7 +146,7 @@ public class DictAwareSolver extends HangmanSolver
             this.sortedFreqMap.remove(guessed);
         }
 
-        System.out.println(sortedFreqMap);
+        //System.out.println(sortedFreqMap);
     }
 
 
