@@ -70,6 +70,8 @@ public class DictAwareSolver extends HangmanSolver
 
         // Pick the most popular symbol
         //char probableGuess = (char) this.sortedFreqMap.keySet().toArray()[0];
+
+        // Analysis shows that, if there is a tie, pick the latter, gives more accuracy. atleast for the given sampleset
         char probableGuess = sortedFreqMap.entrySet().stream()
                              .max((firstChar, secondChar) -> firstChar.getValue() > secondChar.getValue() ? 1 : -1)
                              .get()
@@ -87,14 +89,6 @@ public class DictAwareSolver extends HangmanSolver
     public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
     {
 
-        System.err.println("Guess was : "+c+" Known Words Size : "+this.knownWords.size());
-
-        //if(this.knownWords.size() < 8)
-        {
-            System.err.println("Known Words :\n "+this.knownWords);
-            System.err.println("Known Words Freq Count :\n "+this.sortedFreqMap);
-        }
-
         // Mark it as guessed - again - So that during 2 or n word solver, sample size of other words can be reduced
         if ( ! this.guessedChars.contains(c) )
             this.guessedChars.add(c); //- Commented on 17-10-2020 - To push guessed char directly after guess. check make guess function
@@ -103,7 +97,7 @@ public class DictAwareSolver extends HangmanSolver
         if(bGuess){
             trimSampleSetByCharacter(c, "AT", lPositions.get(0));
         }else{
-            // Wrong guess
+            // Wrong guess,
             trimSampleSetByCharacter(c, "NOT_AT", lPositions.get(0));
         }
 
