@@ -90,14 +90,15 @@ public class DictAwareSolver extends HangmanSolver
     {
 
         // Mark it as guessed - again - So that during 2 or n word solver, sample size of other words can be reduced
+        // For n-word solver
         if ( ! this.guessedChars.contains(c) )
-            this.guessedChars.add(c); //- Commented on 17-10-2020 - To push guessed char directly after guess. check make guess function
+            this.guessedChars.add(c);
 
-        // Character Found
+        // Character Found, Reduce sampleset to words, with letter, at these positions
         if(bGuess){
             trimSampleSetByCharacter(c, "AT", lPositions.get(0));
         }else{
-            // Wrong guess,
+            // Wrong guess, Reduce sample set to words, not with this letters
             trimSampleSetByCharacter(c, "NOT_AT", lPositions.get(0));
         }
 
@@ -130,7 +131,6 @@ public class DictAwareSolver extends HangmanSolver
     public void calSampleSetCharFreqMap(Set<String> dictionary){
 
         this.resetSampleSetCharFreqMap();
-        //this.sampleSetCharFreqMap = new HashMap<>();
 
         // For every word in current sample set
         for(String currWord : dictionary){
@@ -143,7 +143,6 @@ public class DictAwareSolver extends HangmanSolver
                 try{
                     sampleSetCharFreqMap.compute(currAlpha, (alpha, freq) -> freq+1);
                 }catch (NullPointerException np){
-                    // sampleSetCharFreqMap.compute(currAlpha, (alpha, freq) -> freq == null ? 0 : freq + 1);
 
                     // Changed from 0 to 1 to see the effect, special character like ' was not being picked up
                     sampleSetCharFreqMap.compute(currAlpha, (alpha, freq) -> freq == null ? 1 : freq + 1);
@@ -156,11 +155,12 @@ public class DictAwareSolver extends HangmanSolver
                                                                 .sorted(Map.Entry.<Character, Integer> comparingByValue().reversed() )
                                                                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
+        // Removing guessed characters from frequency set
         for(char guessed : this.guessedChars){
             this.sortedFreqMap.remove(guessed);
         }
 
-        System.out.println(sortedFreqMap);
+        //System.out.println(sortedFreqMap);
     }
 
 
@@ -175,7 +175,7 @@ public class DictAwareSolver extends HangmanSolver
      * @param wordSize
      */
     public void trimSampleSetBySize(int wordSize){
-        System.out.println(""+wordSize);
+
         this.knownWords = this.knownWords.stream().filter(word -> word.length() == wordSize).collect(Collectors.toSet());
     }
 
@@ -216,6 +216,7 @@ public class DictAwareSolver extends HangmanSolver
             }
             break;
 
+            // Removes the words that contains letter in it, irrespective of position
             case "NOT_AT" :
             {
                 reducedSet = this.knownWords.stream().filter(word -> !word.contains(String.valueOf(c))).collect(Collectors.toSet());

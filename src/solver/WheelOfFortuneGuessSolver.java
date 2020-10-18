@@ -111,7 +111,7 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
                     // Find next biggest word, recalculate biggestWordIndex
                     this.findBiggestWord();
 
-                    System.out.println("Word Switched");
+                    //System.out.println("Word Switched");
 
                 }
             }
@@ -124,7 +124,7 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
 
         // We have bestNext, Try that
         if(bestNext != -1){
-            System.out.println("Switched Biggest Word Index with Best Next ===> "+bestNext);
+            //System.out.println("Switched Biggest Word Index with Best Next ===> "+bestNext);
             this.bigWordIndex = bestNext;
         }
 
@@ -175,6 +175,12 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
         return bestNext;
     }
 
+    /**
+     * Marks the words, that have been solved.
+     * This happens at each feedback.
+     * This is because, smaller words, might accidently, get guessed, while solving bigger words.
+     * or vice versa, bigger words, might be solved, solving 2 smaller words
+     */
     public void markSolvedWordsIfAny(){
 
         // Iterate over all words

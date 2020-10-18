@@ -62,10 +62,10 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
     @Override
     public char makeGuess() {
 
+        // If we have bestNext word, switch guessing strategy
         int bestNext = findUnsolvedWordWithOneWordLeft();
-        // unrequired condition - && !( "aeiou".contains( String.valueOf(this.allWords.get(bigWordIndex).getSortedFreqMap().keySet().toArray()[0]) )  )
+
         if(bestNext != -1){
-            System.out.println("bestNext switch Occured : "+bestNext);
             bigWordIndex = bestNext;
         }
 
@@ -117,7 +117,7 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
                     // recalculate biggestWordIndex
                     this.findBiggestWord();
 
-                    System.out.println("Word Switched");
+                    //System.out.println("Word Switched");
 
                 }
             }
@@ -142,7 +142,7 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
 
             // Max logic, also check that this word has not been solved so far.
             if(this.allWords.get(i).getWordLength() > max && !solvedWordsIndex.contains(i)){
-                System.out.println(i+"th word size : "+this.allWords.get(i).getWordLength());
+                //System.out.println(i+"th word size : "+this.allWords.get(i).getWordLength());
                 max = this.allWords.get(i).getWordLength();
 
                 // word at this index will be solved now.
@@ -150,8 +150,7 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
             }
         }
 
-        System.out.println("BigWordIndex : " + this.bigWordIndex);
-        //System.exit(0);
+        //System.out.println("BigWordIndex : " + this.bigWordIndex);
     }
 
 
@@ -177,6 +176,12 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
     }
 
 
+    /**
+     * Marks the words, that have been solved.
+     * This happens at each feedback.
+     * This is because, smaller words, might accidently, get guessed, while solving bigger words.
+     * or vice versa, bigger words, might be solved, solving 2 smaller words
+     */
     public void markSolvedWordsIfAny(){
 
         // Iterate over all words
