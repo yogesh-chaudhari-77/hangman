@@ -13,19 +13,19 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
 {
 
     // Dictionary that has been fed initially.
-    Set<String> originalDictionary = null;
+    private Set<String> originalDictionary = null;
 
     // All words are trying to guess
-    ArrayList<DictAwareSolver> allWords = null;
+    private ArrayList<DictAwareSolver> allWords = null;
 
     // All words index that we have guessed completely so far
-    ArrayList<Integer> solvedWordsIndex = new ArrayList<Integer>();
+    private ArrayList<Integer> solvedWordsIndex = new ArrayList<Integer>();
 
     // We are going big work first strategy. Stores the current word under execution
-    int bigWordIndex = -1;
+    private int bigWordIndex = -1;
 
     // All guessed chars
-    Set<Character> guessedChars = null;
+    private Set<Character> guessedChars = null;
 
 
     /**
@@ -196,5 +196,33 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
             }
         }
     }
+
+
+    // 18-10-2020 - Yogeshwar Chaudhari - Needed for Testing
+    public ArrayList<DictAwareSolver> getAllWords() {
+        return allWords;
+    }
+
+    public void setAllWords(ArrayList<DictAwareSolver> allWords) {
+        this.allWords = allWords;
+    }
+
+    public ArrayList<Integer> getSolvedWordsIndex() {
+        return solvedWordsIndex;
+    }
+
+    public void setSolvedWordsIndex(ArrayList<Integer> solvedWordsIndex) {
+        this.solvedWordsIndex = solvedWordsIndex;
+    }
+
+    public Set<Character> getGuessedChars() {
+        return guessedChars;
+    }
+
+    public void setGuessedChars(Set<Character> guessedChars) {
+        this.guessedChars = guessedChars;
+    }
+
+    // 18-10-2020 - Getter setter ends here
 
 } // end of class WheelOfFortuneGuessSolver

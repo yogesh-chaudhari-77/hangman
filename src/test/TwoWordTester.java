@@ -6,14 +6,17 @@ import solver.TwoWordHangmanGuessSolver;
 import trace.HangmanGameTracer;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
+/**
+ * Tester class implementation for running random test cases for twoword hangman
+ * It requires the dictionary, it draws combination of 2 words from the dictionary.
+ */
 public class TwoWordTester {
 
     public static void main(String [] args) throws IOException {
+
+        Random randomUtil = new Random();
 
         // solver type
         String solverType = "twoword";
@@ -21,7 +24,7 @@ public class TwoWordTester {
         // dictionary filename
         String dictionaryFilename = System.getProperty("user.dir")+"/src/ausDict.txt";
 
-        int maxIncorrectGuesses = 3;
+        int maxIncorrectGuesses = 7;
 
         // (optional) game trace filename
         String gameTraceFilename = null;
@@ -32,15 +35,17 @@ public class TwoWordTester {
         String [] dictionaryArr = new String[dictionary.size()];
         dictionary.toArray(dictionaryArr);
 
-        FileWriter csvWriter = new FileWriter(System.getProperty("user.dir")+"/src/test/results/twoWordTestResults.csv");
-        csvWriter.append("Word,GuesseAllowed,Result,WordsLeftInSampleSet_word_1,WordsLeftInSampleSet_word_2,SequenceOfGuessedLetters\n");
+        FileWriter csvWriter = new FileWriter(System.getProperty("user.dir")+"/src/test/results/twoWordTestResults_7Guesses12k_Words_2.csv");
+        csvWriter.append("Sr,Word,GuesseAllowed,Result,WordsLeftInSampleSet,SequenceOfGuessedLetters\n");
 
+        int z = 1;
         // Perform test for each word
         // for(String firstWord : dictionary){
-        for(int i = 0; i < dictionaryArr.length; i++){
+        for(int i = 0; i < 25000; i++){
 
             //for(String secondWord : dictionary){
-            for(int j = i+1; j < dictionaryArr.length; j++){
+            //for(int j = i+1; j < dictionaryArr.length; j++)
+            {
 
                 PrintWriter outWriter = null;
                 PrintWriter traceWriter = null;
@@ -48,8 +53,12 @@ public class TwoWordTester {
                 // construct in and output streams/writers/readers
                 outWriter = new PrintWriter(System.out, true);
 
+                // Form a random word
+                int firstWordIndex = randomUtil.nextInt((dictionaryArr.length - 10));
+                int lastWordIndex = randomUtil.nextInt((dictionaryArr.length - 10));
+
                 // string ot guess (must be specified by double quotes "" on command line)
-                String toGuess = dictionaryArr[i]+" "+dictionaryArr[j];
+                String toGuess = dictionaryArr[firstWordIndex]+" "+dictionaryArr[lastWordIndex];
 
                 // check if words are in dictionary
                 String[] wordsToGuess = toGuess.split(" ");
@@ -70,16 +79,19 @@ public class TwoWordTester {
                 HangmanSolver solver = null;
                 solver = new TwoWordHangmanGuessSolver(dictionary);
 
-                if(!game.runGame(wordsToGuess, maxIncorrectGuesses, solver)){
-
+                boolean result = game.runGame(wordsToGuess, maxIncorrectGuesses, solver);
+                {
                     String guessSequence = "";
                     for(Character c : ((TwoWordHangmanGuessSolver) solver).getGuessedChars()){
                         guessSequence += ""+c+" | ";
                     }
+                    // Removing the last |
+                    guessSequence = guessSequence.substring(0, guessSequence.length()-1);
 
-                    csvWriter.append(toGuess+","+maxIncorrectGuesses+","+"false"+","+((TwoWordHangmanGuessSolver) solver).getAllWords().get(0).getKnownWords().size()+","+((TwoWordHangmanGuessSolver) solver).getAllWords().get(1).getKnownWords().size()+","+guessSequence+"\n");
+                    csvWriter.append(z+","+toGuess+","+maxIncorrectGuesses+","+result+","+((TwoWordHangmanGuessSolver) solver).getAllWords().get(0).getKnownWords().size()+","+((TwoWordHangmanGuessSolver) solver).getAllWords().get(1).getKnownWords().size()+","+guessSequence+"\n");
                 }
 
+                z++;
             }
 
         }
