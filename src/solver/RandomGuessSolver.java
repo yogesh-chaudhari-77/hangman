@@ -18,10 +18,15 @@ import static java.util.Arrays.*;
 public class RandomGuessSolver extends HangmanSolver
 {
 
+    // a-z char set from which characters will be drawn
     private static List<String> charsSet = null;
+
+    // Special vowel set to increase the winning chances.
     private static List<String> vowelCharsSet = null;
 
+    // Maintains the gussedChars, not be guessed again
     private List<String> guessedChars;
+
     private Random randomUtil;
 
     /**
@@ -90,6 +95,7 @@ public class RandomGuessSolver extends HangmanSolver
     @Override
     public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
     {
+        // Can't do anything with the feedback as it is random.
 
     } // end of guessFeedback()
 

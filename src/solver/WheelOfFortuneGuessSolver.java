@@ -103,15 +103,25 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
 
                 // Check if, the word has been solved completely
                 // If completely solved, the guesses chars will have all characters from reduced set. that is 1 one the sample set reduced to
-                if (this.guessedChars.containsAll(Set.of(Arrays.stream(word.split("")).distinct().map(x -> x.charAt(0)).toArray())) ) {
 
+                Set<Character> charsInLeftOneword = new HashSet<Character>();
+                for( String s : word.split("")) {
+                    try{
+                        charsInLeftOneword.add( (Character) s.charAt(0) );
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+
+                //if (this.guessedChars.containsAll(Set.of(Arrays.stream(word.split("")).distinct().map(x -> x.charAt(0)).toArray())) ) {
+                if (this.guessedChars.containsAll( charsInLeftOneword ) ) {
                     // Mark it as solved
                     solvedWordsIndex.add(bigWordIndex);
 
                     // Find next biggest word, recalculate biggestWordIndex
                     this.findBiggestWord();
 
-                    System.out.println("Word Switched");
+                    //System.out.println("Word Switched");
 
                 }
             }
@@ -124,7 +134,7 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
 
         // We have bestNext, Try that
         if(bestNext != -1){
-            System.out.println("Switched Biggest Word Index with Best Next ===> "+bestNext);
+            //System.out.println("Switched Biggest Word Index with Best Next ===> "+bestNext);
             this.bigWordIndex = bestNext;
         }
 
@@ -175,6 +185,12 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
         return bestNext;
     }
 
+    /**
+     * Marks the words, that have been solved.
+     * This happens at each feedback.
+     * This is because, smaller words, might accidently, get guessed, while solving bigger words.
+     * or vice versa, bigger words, might be solved, solving 2 smaller words
+     */
     public void markSolvedWordsIfAny(){
 
         // Iterate over all words
@@ -186,8 +202,18 @@ public class WheelOfFortuneGuessSolver extends HangmanSolver
                 // Get that one remaining word
                 for(String remainedWord : this.allWords.get(i).getKnownWords()){
 
+                    Set<Character> charsInLeftOneword = new HashSet<Character>();
+                    for( String s : remainedWord.split("")) {
+                        try{
+                            charsInLeftOneword.add( (Character) s.charAt(0) );
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     // If guessedChars contains all chars in remainedWord, that word has already been guessed and should be skipped
-                    if (this.guessedChars.containsAll(Set.of(Arrays.stream(remainedWord.split("")).distinct().map(x -> x.charAt(0)).toArray())) ) {
+                    // if (this.guessedChars.containsAll(Set.of(Arrays.stream(remainedWord.split("")).distinct().map(x -> x.charAt(0)).toArray())) ) {
+                    if (this.guessedChars.containsAll( charsInLeftOneword ) ) {
 
                         // Marking this word as solved
                         this.solvedWordsIndex.add(i);

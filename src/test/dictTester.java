@@ -11,6 +11,9 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * Class implementation for performing emperical testing of One word - dictionary aware solver.
+ */
 public class dictTester {
 
     public static void main(String [] args) throws IOException {
