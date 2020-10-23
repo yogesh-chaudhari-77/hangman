@@ -1,6 +1,5 @@
 package solver;
 
-import java.rmi.MarshalledObject;
 import java.util.*;
 import java.lang.System;
 import java.util.stream.Collectors;
@@ -32,7 +31,7 @@ public class DictAwareSolver extends HangmanSolver
     private HashMap<Character, Integer> sampleSetCharFreqMap = null;
 
     // Same as above but sorted by count popularity in decreasing order
-    LinkedHashMap<Character, Integer> sortedFreqMap  = null;
+    HashMap<Character, Integer> sortedFreqMap  = null;
 
     private int wordLength = 0;
 
@@ -46,7 +45,7 @@ public class DictAwareSolver extends HangmanSolver
         this.knownWords = dictionary;
         this.guessedChars = new ArrayList<Character>();
         this.sampleSetCharFreqMap = new HashMap<Character, Integer>();
-        LinkedHashMap<Character, Integer> sortedFreqMap  = new LinkedHashMap<Character, Integer>();
+        sortedFreqMap  = new HashMap<>();
 
     } // end of DictAwareSolver()
 
@@ -54,6 +53,9 @@ public class DictAwareSolver extends HangmanSolver
     @Override
     public void newGame(int[] wordLengths, int maxIncorrectGuesses)
     {
+        // Added 17-10-2020 - wordLength was not being set
+        wordLength = wordLengths[0];
+
         // Trim known words to contain words with word to be gussed length
         this.trimSampleSetBySize(wordLengths[0]);
 
@@ -67,7 +69,14 @@ public class DictAwareSolver extends HangmanSolver
     public char makeGuess() {
 
         // Pick the most popular symbol
-        char probableGuess = (char) this.sortedFreqMap.keySet().toArray()[0];
+        //char probableGuess = (char) this.sortedFreqMap.keySet().toArray()[0];
+        char probableGuess = sortedFreqMap.entrySet().stream()
+                             .max((firstChar, secondChar) -> firstChar.getValue() > secondChar.getValue() ? 1 : -1)
+                             .get()
+                             .getKey();
+
+        // Mark it as guessed - added - 17-10-2020
+        this.guessedChars.add(probableGuess);
 
         return probableGuess;
 
@@ -77,8 +86,18 @@ public class DictAwareSolver extends HangmanSolver
     @Override
     public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
     {
-        // Mark it as guessed
-        this.guessedChars.add(c);
+
+        System.err.println("Guess was : "+c+" Known Words Size : "+this.knownWords.size());
+
+        //if(this.knownWords.size() < 8)
+        {
+            System.err.println("Known Words :\n "+this.knownWords);
+            System.err.println("Known Words Freq Count :\n "+this.sortedFreqMap);
+        }
+
+        // Mark it as guessed - again - So that during 2 or n word solver, sample size of other words can be reduced
+        if ( ! this.guessedChars.contains(c) )
+            this.guessedChars.add(c); //- Commented on 17-10-2020 - To push guessed char directly after guess. check make guess function
 
         // Character Found
         if(bGuess){
@@ -90,8 +109,6 @@ public class DictAwareSolver extends HangmanSolver
 
         // Recalculate the popularity of symbols in reduced dictionary
         this.calSampleSetCharFreqMap(this.knownWords);
-        // System.out.println("Known words reduced to "+this.knownWords.size());
-        // System.out.println(knownWords);
 
     } // end of guessFeedback()
 
@@ -119,6 +136,7 @@ public class DictAwareSolver extends HangmanSolver
     public void calSampleSetCharFreqMap(Set<String> dictionary){
 
         this.resetSampleSetCharFreqMap();
+        //this.sampleSetCharFreqMap = new HashMap<>();
 
         // For every word in current sample set
         for(String currWord : dictionary){
@@ -131,7 +149,10 @@ public class DictAwareSolver extends HangmanSolver
                 try{
                     sampleSetCharFreqMap.compute(currAlpha, (alpha, freq) -> freq+1);
                 }catch (NullPointerException np){
-                    sampleSetCharFreqMap.compute(currAlpha, (alpha, freq) -> freq == null ? 0 : freq + 1);
+                    // sampleSetCharFreqMap.compute(currAlpha, (alpha, freq) -> freq == null ? 0 : freq + 1);
+
+                    // Changed from 0 to 1 to see the effect, special character like ' was not being picked up
+                    sampleSetCharFreqMap.compute(currAlpha, (alpha, freq) -> freq == null ? 1 : freq + 1);
                 }
             }
         }
@@ -145,7 +166,7 @@ public class DictAwareSolver extends HangmanSolver
             this.sortedFreqMap.remove(guessed);
         }
 
-        //System.out.println(sortedFreqMap);
+        System.out.println(sortedFreqMap);
     }
 
 
@@ -239,7 +260,7 @@ public class DictAwareSolver extends HangmanSolver
         this.sampleSetCharFreqMap = sampleSetCharFreqMap;
     }
 
-    public LinkedHashMap<Character, Integer> getSortedFreqMap() {
+    public HashMap<Character, Integer> getSortedFreqMap() {
         return sortedFreqMap;
     }
 

@@ -62,6 +62,45 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
     @Override
     public char makeGuess() {
 
+        int bestNext = findUnsolvedWordWithOneWordLeft();
+        // unrequired condition - && !( "aeiou".contains( String.valueOf(this.allWords.get(bigWordIndex).getSortedFreqMap().keySet().toArray()[0]) )  )
+        if(bestNext != -1){
+            System.out.println("bestNext switch Occured : "+bestNext);
+            bigWordIndex = bestNext;
+        }
+
+        // Guessing from frequency distribution
+        // Note that, sample size of all words have been reduced greatly at this point
+        char possibleChar = this.allWords.get(bigWordIndex).makeGuess();
+
+        // Mark it visited already
+        this.guessedChars.add(possibleChar);
+
+        return possibleChar;
+    } // end of makeGuess()
+
+
+    @Override
+    public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
+    {
+        // Iterate over feedback of all words
+        for(int i = 0; i < this.allWords.size(); i++){
+
+            // Create a feedback arraylist suitable for Single word solver
+            ArrayList<ArrayList<Integer>> lpos = new ArrayList<ArrayList<Integer>>();
+            lpos.add(lPositions.get(i));
+
+            // Null means, guesses char did not appear for this word
+            if(lPositions.get(i) == null){
+                allWords.get(i).guessFeedback(c, false, lpos );
+            }else{
+                // It appeared for this word
+                allWords.get(i).guessFeedback(c, true, lpos );
+            }
+        }
+
+        markSolvedWordsIfAny();
+
         // Check if the first biggest word has been solved
         if(this.allWords.get(bigWordIndex).getKnownWords().size() == 1) {
 
@@ -84,37 +123,6 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
             }
         }
 
-        // Guessing from frequency distribution
-        // Note that, sample size of all words have been reduced greatly at this point
-        char possibleChar = this.allWords.get(bigWordIndex).makeGuess();
-
-        // Mark it visited already
-        this.guessedChars.add(possibleChar);
-
-        return possibleChar;
-    } // end of makeGuess()
-
-
-    @Override
-    public void guessFeedback(char c, Boolean bGuess, ArrayList< ArrayList<Integer> > lPositions)
-    {
-
-        // Iterate over feedback of all words
-        for(int i = 0; i < this.allWords.size(); i++){
-
-            // Create a feedback arraylist suitable for Single word solver
-            ArrayList<ArrayList<Integer>> lpos = new ArrayList<ArrayList<Integer>>();
-            lpos.add(lPositions.get(i));
-
-            // Null means, guesses char did not appear for this word
-            if(lPositions.get(i) == null){
-                allWords.get(i).guessFeedback(c, false, lpos );
-            }else{
-                // It appeared for this word
-                allWords.get(i).guessFeedback(c, true, lpos );
-            }
-        }
-
     } // end of guessFeedback()
 
 
@@ -127,17 +135,88 @@ public class TwoWordHangmanGuessSolver extends HangmanSolver
 
         int max = -1;
 
+        System.out.println("All Words Size : "+this.allWords.size());
+
         // Iterate over all words
         for(int i = 0; i < this.allWords.size(); i++){
 
             // Max logic, also check that this word has not been solved so far.
             if(this.allWords.get(i).getWordLength() > max && !solvedWordsIndex.contains(i)){
+                System.out.println(i+"th word size : "+this.allWords.get(i).getWordLength());
                 max = this.allWords.get(i).getWordLength();
 
                 // word at this index will be solved now.
                 this.bigWordIndex = i;
             }
         }
+
+        System.out.println("BigWordIndex : " + this.bigWordIndex);
+        //System.exit(0);
     }
+
+
+    /**
+     * From a set of words, find an unsolved word, that has only one word left in sample set
+     */
+    public int findUnsolvedWordWithOneWordLeft(){
+
+        int bestNext = -1;
+
+        // Iterate over all words
+        for(int i = 0; i < this.allWords.size(); i++){
+
+            // Max logic, also check that this word has not been solved so far.
+            if(this.allWords.get(i).getKnownWords().size() == 1 && !solvedWordsIndex.contains(i)){
+
+                // word at this index will be solved now.
+                bestNext = i;
+            }
+        }
+
+        return bestNext;
+    }
+
+
+    public void markSolvedWordsIfAny(){
+
+        // Iterate over all words
+        for(int i = 0; i < this.allWords.size(); i++){
+
+            // Reduced sample size must be one
+            if(this.allWords.get(i).getKnownWords().size() == 1){
+
+                // Get that one remaining word
+                for(String remainedWord : this.allWords.get(i).getKnownWords()){
+
+                    // If guessedChars contains all chars in remainedWord, that word has already been guessed and should be skipped
+                    if (this.guessedChars.containsAll(Set.of(Arrays.stream(remainedWord.split("")).distinct().map(x -> x.charAt(0)).toArray())) ) {
+
+                        // Marking this word as solved
+                        this.solvedWordsIndex.add(i);
+                    }
+                }
+            }
+        }
+    }
+
+    // Getter-Setters Added Here
+
+    public Set<Character> getGuessedChars() {
+        return guessedChars;
+    }
+
+    public void setGuessedChars(Set<Character> guessedChars) {
+        this.guessedChars = guessedChars;
+    }
+
+    public ArrayList<DictAwareSolver> getAllWords() {
+        return allWords;
+    }
+
+    public void setAllWords(ArrayList<DictAwareSolver> allWords) {
+        this.allWords = allWords;
+    }
+
+// Getter Setters Ends Here
 
 } // end of class TwoWordHangmanGuessSolver
